@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spotiview</title>
+    <style>
+        body {
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            background-color: #121212;
+            color: #FFFFFF;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            overflow: hidden;
+            position: relative; /* Position für das Overlay */
+        }
+
+        /* Hintergrundbild mit Blur-Effekt */
+        .background-cover {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('{{ album_cover_url }}'); /* Albumcover als Hintergrundbild */
+            background-size: cover;
+            background-position: center;
+            filter: blur(5px); /* Blur-Effekt */
+            z-index: -1; /* Ganz nach hinten */
+        }
+
+        /* Ein semi-transparentes Overlay, um den Inhalt besser lesbar zu machen */
+        .overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5); /* Schwarzes, halbtransparentes Overlay */
+            z-index: 0; /* Direkt über dem Hintergrund, aber unter dem restlichen Inhalt */
+        }
+
+        .vinyl-container {
+            position: relative;
+            width: 900px; /* Größe der Schallplatte */
+            height: 900px; /* Größe der Schallplatte */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            animation: rotate 5s linear infinite; /* Rotation des Containers */
+            z-index: 1; /* Sicherstellen, dass es über dem Overlay ist */
+        }
+
+        .vinyl {
+            width: 100%; /* Größe der Schallplatte an den Container angepasst */
+            height: 100%; /* Größe der Schallplatte an den Container angepasst */
+            position: absolute; /* Absolute Positionierung */
+            z-index: 1; /* Stellt sicher, dass die Schallplatte hinter dem Albumcover liegt */
+            pointer-events: none; /* Verhindert, dass die Schallplatte Interaktionen blockiert */
+        }
+
+        .album-cover {
+            width: 330px; /* Größe des Albumcovers */
+            height: 330px; /* Größe des Albumcovers */
+            border-radius: 50%; /* Rundes Albumcover */
+            position: absolute; /* Absolute Positionierung */
+            z-index: 2; /* Über der Schallplatte */
+            pointer-events: none; /* Verhindert Interaktionen */
+        }
+
+        .track-info {
+            text-align: center;
+            margin-top: 20px; /* Abstand nach oben für die Schallplatte */
+            z-index: 1; /* Über dem Overlay */
+        }
+
+        .track-details {
+            font-size: 2.5em; /* Größere Schriftgröße */
+            margin-top: 20px; /* Abstand nach oben für die Track-Informationen */
+        }
+
+        a {
+            color: #FFFFFF;
+            text-decoration: none;
+            border-bottom: 1px solid #FFFFFF;
+            transition: color 0.3s, border-bottom 0.3s;
+        }
+
+        a:hover {
+            color: #000000;
+            border-bottom: 1px solid #000000;
+        }
+
+        .neon-text {
+            font-size: 2em; /* Größe des Neon-Textes */
+            color: #FFFFFF; /* Basisfarbe des Neon-Textes */
+            text-shadow: 
+                0 0 5px #ffffff, 
+                0 0 10px #ffffff, 
+                0 0 15px #ff00ff, 
+                0 0 20px #ff00ff, 
+                0 0 25px #ff00ff, 
+                0 0 30px #ff00ff, 
+                0 0 35px #ff00ff;
+            animation: neon-glow 1.5s ease-in-out infinite alternate; /* Neon-Glühen-Animation */
+            margin-bottom: 20px; /* Abstand nach oben für den Neon-Text */
+            z-index: 1; /* Über dem Overlay */
+        }
+
+        @keyframes neon-glow {
+            from {
+                text-shadow: 
+                    0 0 5px #00ffdd, 
+                    0 0 10px #00ffdd, 
+                    0 0 15px #00ffdd, 
+                    0 0 20px #00ffdd, 
+                    0 0 25px #00ffdd, 
+                    0 0 30px #00ffdd, 
+                    0 0 35px #00ffdd;
+            }
+            to {
+                text-shadow: 
+                    0 0 10px #bb00ab, 
+                    0 0 20px #bb00ab, 
+                    0 0 30px #bb00ab, 
+                    0 0 40px #bb00ab, 
+                    0 0 50px #bb00ab, 
+                    0 0 60px #bb00ab, 
+                    0 0 70px #bb00ab;
+            }
+        }
+
+        @keyframes rotate {
+            from {
+                transform: rotate(0deg);
+            }
+            to {
+                transform: rotate(360deg);
+            }
+        }
+    </style>
+    <meta http-equiv="refresh" content="30">
+</head>
+<body>
+    <!-- Hintergrund mit Blur-Effekt -->
+    <div class="background-cover"></div>
+    <!-- Semi-transparentes Overlay -->
+    <div class="overlay"></div>
+    
+    <div class="vinyl-container">
+        <img class="vinyl" src="/static/schallplatte.png" alt="">
+        {% if track_name and artist_name %}
+            <img class="album-cover" src="{{ album_cover_url }}" alt="Album Cover">
+        {% endif %}
+    </div>
+    
+    <p class="neon-text"><strong>NOW PLAYING:</strong></p>
+    
+    <div class="track-info">
+        {% if track_name and artist_name %}
+            <div class="track-details">
+                <p><strong>Track:</strong> {{ track_name }}</p>
+                <p><strong>Artist:</strong> {{ artist_name }}</p>
+            </div>
+        {% else %}
+            <p>Keine Musik wird aktuell abgespielt oder das Access Token ist abgelaufen. Bitte <a href="youtube.com">erneut anmelden</a>.</p>
+            <meta http-equiv="refresh" content="30">
+        {% endif %}
+    </div>
+</body>
+</html>
