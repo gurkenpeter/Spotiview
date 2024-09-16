@@ -8,7 +8,7 @@ app.secret_key = os.urandom(24)  # Secret key for session management
 # Spotify API Konfiguration
 SPOTIFY_CLIENT_ID = 'ee79aef75d23416dbcfadae448a4d4c7'
 SPOTIFY_CLIENT_SECRET = 'fc0883b75d9c44b8bda50fc6daa2b375'
-SPOTIFY_REDIRECT_URI = 'http://localhost:5000/callback'
+SPOTIFY_REDIRECT_URI = 'https://spotiview-one.vercel.app/'
 SPOTIFY_TOKEN_URL = 'https://accounts.spotify.com/api/token'
 SPOTIFY_AUTH_URL = 'https://accounts.spotify.com/authorize'
 SPOTIFY_API_BASE_URL = 'https://api.spotify.com/v1'
